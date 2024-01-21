@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "183afcb8-c8d4-48df-b27f-76d125739efc",
+		"name": "QAuto_API_tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15432138"
+	},
+	"item": [
+		{
+			"name": "Signup",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var requestBody = pm.request.body;\r",
+							"var jsonData = JSON.parse(requestBody);\r",
+							"\r",
+							"pm.environment.set(\"name\", jsonData.name);\r",
+							"pm.environment.set(\"lastName\", jsonData.lastName);\r",
+							"\r",
+							"var nameFromEnvironment = pm.environment.get(\"name\");\r",
+							"var lastNameFromEnvironment = pm.environment.get(\"lastName\");\r",
+							"\r",
+							"pm.test(\"Проверка поля name на длину и отсутствие специальных символов\", function () {\r",
+							"    pm.expect(nameFromEnvironment).to.match(/^[\\w\\s-]{2,20}$/); // Проверка поля name\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Проверка поля lastName на длину и отсутствие специальных символов\", function () {\r",
+							"    pm.expect(lastNameFromEnvironment).to.match(/^[\\w\\s-]{2,20}$/); // Проверка поля lastName\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Leonid\",\r\n  \"lastName\": \"Utesov\",\r\n  \"email\": \"utesov3@gmail.com\",\r\n  \"password\": \"Qwerty123\",\r\n  \"repeatPassword\": \"Qwerty123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL_Var}}/auth/signup",
+					"host": [
+						"{{URL_Var}}"
+					],
+					"path": [
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Profile Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Переменная с разными вариантами значений для поля name\r",
+							"var lastNameVariants = [\r",
+							"   { lastName: \"Shevchenko\" }\r",
+							"    // Добавьте другие варианты значений name по вашему усмотрению\r",
+							"];\r",
+							"\r",
+							"// Цикл для выполнения запроса с разными значениями поля name\r",
+							"_.each(lastNameVariants, function (data) {\r",
+							"    pm.environment.set(\"lastName\", data.lastName);\r",
+							"\r",
+							"    var lastNameFromEnvironment = pm.environment.get(\"lastName\");\r",
+							"    \r",
+							"\r",
+							"    pm.test(\"Проверка поля name на длину, отсутствие специальных символов или пустое поле\", function () {\r",
+							"        var minLength = 2;\r",
+							"        var maxLength = 20;\r",
+							"        var regex = /^[\\w\\s-]+$/; // Регулярное выражение для проверки отсутствия специальных символов\r",
+							"\r",
+							"        pm.expect(lastNameFromEnvironment.length).to.be.within(minLength, maxLength); // Проверка длины поля name\r",
+							"        pm.expect(lastNameFromEnvironment).to.match(regex); // Проверка отсутствия специальных символов в поле name\r",
+							"        pm.expect(lastNameFromEnvironment).not.to.eql('');\r",
+							"    });\r",
+							"        });\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{name}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"dateBirth\": \"1979-04-23T15:21:05.000Z\",\r\n  \"country\": \"Ukraine\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL_Var}}/users/profile",
+					"host": [
+						"{{URL_Var}}"
+					],
+					"path": [
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Пользователь успешно удален!\", function () {\r",
+							"    var expectedData = {\r",
+							"        \"status\": \"ok\",\r",
+							"    };\r",
+							"\r",
+							"var responseData = pm.response.json();\r",
+							"    pm.expect(responseData.status).to.eql(expectedData.status);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL_Var}}/users",
+					"host": [
+						"{{URL_Var}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
